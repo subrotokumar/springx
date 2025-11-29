@@ -1,6 +1,5 @@
-package option
+package spring
 
-// Command line flags
 type ProjectInitializr struct {
 	Project           string
 	Language          string

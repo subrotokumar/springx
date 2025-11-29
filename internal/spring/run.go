@@ -1,4 +1,4 @@
-package initializr
+package spring
 
 import (
 	"encoding/json"

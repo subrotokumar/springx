@@ -6,10 +6,9 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/subrotokumar/springx/cmd/core"
-	"github.com/subrotokumar/springx/cmd/option"
 	"github.com/subrotokumar/springx/cmd/ui/inputtext"
 	"github.com/subrotokumar/springx/cmd/ui/selector"
-	springInitizr "github.com/subrotokumar/springx/internal/initializr"
+	"github.com/subrotokumar/springx/internal/spring"
 )
 
 const logo = `
@@ -22,7 +21,7 @@ const logo = `
 `
 
 var initCmd = &cobra.Command{
-	Use:   "init [project-name]",
+	Use:   "init",
 	Short: "Initialize a new Spring Boot project",
 	Long: `Initialize a new Spring Boot project with the specified configuration.
 
@@ -34,13 +33,13 @@ build tool, Java version, and other project metadata.`,
 		fmt.Println()
 		fmt.Println(core.LogoStyle.Render(logo))
 
-		initializr, err := springInitizr.Run()
+		initializr, err := spring.Run()
 		if err != nil {
 			fmt.Printf("%v", err.Error())
 			os.Exit(0)
 		}
 
-		projectMetadata := option.ProjectMetadata{
+		projectMetadata := spring.ProjectMetadata{
 			GroupID:       initializr.GroupID.Default,
 			ArtifactID:    initializr.ArtifactID.Default,
 			Name:          initializr.Name.Default,
@@ -50,23 +49,23 @@ build tool, Java version, and other project metadata.`,
 			Configuration: initializr.ConfigurationFileFormat.Default,
 			JavaVersion:   initializr.JavaVersion.Default,
 		}
-		ProjectInitializr := option.ProjectInitializr{
+		projectInitializr := spring.ProjectInitializr{
 			Project:           initializr.Type.Default,
 			Language:          initializr.Language.Default,
 			SpringBootVersion: initializr.BootVersion.Default,
 		}
 
 		title := "Project"
-		ProjectInitializr.Project = selector.New(title, initializr.GetProjectTypes()).Run()
-		fmt.Printf("%s: %s\n", core.QuestionStyle.Render(title), ProjectInitializr.Project)
+		projectInitializr.Project = selector.New(title, initializr.GetProjectTypes()).Run()
+		fmt.Printf("%s: %s\n", core.QuestionStyle.Render(title), projectInitializr.Project)
 
 		title = "Language"
-		ProjectInitializr.Language = selector.New(title, initializr.GetLanguages()).Run()
-		fmt.Printf("%s: %s\n", core.QuestionStyle.Render(title), ProjectInitializr.Language)
+		projectInitializr.Language = selector.New(title, initializr.GetLanguages()).Run()
+		fmt.Printf("%s: %s\n", core.QuestionStyle.Render(title), projectInitializr.Language)
 
 		title = "Spring Boot Version"
-		ProjectInitializr.SpringBootVersion = selector.New(title, initializr.GetBootVersions()).Run()
-		fmt.Printf("%s: %s\n", core.QuestionStyle.Render(title), ProjectInitializr.SpringBootVersion)
+		projectInitializr.SpringBootVersion = selector.New(title, initializr.GetBootVersions()).Run()
+		fmt.Printf("%s: %s\n", core.QuestionStyle.Render(title), projectInitializr.SpringBootVersion)
 
 		title = "Group"
 		projectMetadata.GroupID = inputtext.New(title, initializr.GroupID.Default).Run()
@@ -101,7 +100,9 @@ build tool, Java version, and other project metadata.`,
 		projectMetadata.JavaVersion = selector.New(title, initializr.GetJavaVersions()).Run()
 		fmt.Printf("  %s: %s\n", core.LogoStyle.Render(title), projectMetadata.JavaVersion)
 
-		if err := springInitizr.StarterZip(); err != nil {
+		projectInitializr.ProjectMetadata = projectMetadata
+
+		if err := projectInitializr.Starter(); err != nil {
 			panic(err)
 		}
 	},

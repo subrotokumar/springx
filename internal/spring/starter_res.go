@@ -1,4 +1,4 @@
-package initializr
+package spring
 
 type SpringInitializrResponse struct {
 	Links                   map[string]Link    `json:"_links"`
@@ -86,19 +86,16 @@ type IdNamePair struct {
 	Name string `json:"name"`
 }
 
-// DependencyReference represents a reference link for a dependency
 type DependencyReference struct {
 	Href      string `json:"href"`
 	Templated bool   `json:"templated,omitempty"`
 }
 
-// DependencyGuide represents a guide link for a dependency
 type DependencyGuide struct {
 	Href  string `json:"href"`
 	Title string `json:"title"`
 }
 
-// GetDependenciesByGroup returns all dependencies organized by group name
 func (r *SpringInitializrResponse) GetDependenciesByGroup() map[string][]DependencyDetail {
 	result := make(map[string][]DependencyDetail)
 	for _, group := range r.Dependencies.Values {
@@ -107,7 +104,6 @@ func (r *SpringInitializrResponse) GetDependenciesByGroup() map[string][]Depende
 	return result
 }
 
-// FindDependencyByID searches for a dependency by its ID across all groups
 func (r *SpringInitializrResponse) FindDependencyByID(id string) *DependencyDetail {
 	for _, group := range r.Dependencies.Values {
 		for _, dep := range group.Values {
@@ -119,7 +115,6 @@ func (r *SpringInitializrResponse) FindDependencyByID(id string) *DependencyDeta
 	return nil
 }
 
-// GetAllDependencies returns a flat list of all dependencies
 func (r *SpringInitializrResponse) GetAllDependencies() []DependencyDetail {
 	var deps []DependencyDetail
 	for _, group := range r.Dependencies.Values {
@@ -128,7 +123,6 @@ func (r *SpringInitializrResponse) GetAllDependencies() []DependencyDetail {
 	return deps
 }
 
-// GetDependencyIDs returns a list of all dependency IDs
 func (r *SpringInitializrResponse) GetDependencyIDs() []string {
 	var ids []string
 	for _, group := range r.Dependencies.Values {
@@ -139,7 +133,6 @@ func (r *SpringInitializrResponse) GetDependencyIDs() []string {
 	return ids
 }
 
-// GetJavaVersions returns available Java versions
 func (r *SpringInitializrResponse) GetJavaVersions() []string {
 	var versions []string
 	for _, v := range r.JavaVersion.Values {
@@ -148,7 +141,6 @@ func (r *SpringInitializrResponse) GetJavaVersions() []string {
 	return versions
 }
 
-// GetBootVersions returns available Spring Boot versions
 func (r *SpringInitializrResponse) GetBootVersions() []string {
 	var versions []string
 	for _, v := range r.BootVersion.Values {
@@ -157,7 +149,6 @@ func (r *SpringInitializrResponse) GetBootVersions() []string {
 	return versions
 }
 
-// GetLanguages returns available programming languages
 func (r *SpringInitializrResponse) GetLanguages() []string {
 	var languages []string
 	for _, l := range r.Language.Values {
@@ -166,7 +157,6 @@ func (r *SpringInitializrResponse) GetLanguages() []string {
 	return languages
 }
 
-// GetBuildTypes returns available build types
 func (r *SpringInitializrResponse) GetBuildTypes() []string {
 	var types []string
 	for _, p := range r.Packaging.Values {
@@ -175,7 +165,6 @@ func (r *SpringInitializrResponse) GetBuildTypes() []string {
 	return types
 }
 
-// GetProjectTypes returns available build types
 func (r *SpringInitializrResponse) GetProjectTypes() []string {
 	var types []string
 	for _, p := range r.Type.Values {
@@ -184,7 +173,6 @@ func (r *SpringInitializrResponse) GetProjectTypes() []string {
 	return types
 }
 
-// GetPackagingTypes returns available packaging types
 func (r *SpringInitializrResponse) GetPackagingTypes() []string {
 	var types []string
 	for _, p := range r.Packaging.Values {
@@ -193,7 +181,6 @@ func (r *SpringInitializrResponse) GetPackagingTypes() []string {
 	return types
 }
 
-// GetPackagingTypes returns available packaging types
 func (r *SpringInitializrResponse) GetConfigurationFileFormat() []string {
 	types := []string{"Properties", "YAML"}
 	return types

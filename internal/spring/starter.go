@@ -1,10 +1,11 @@
-package initializr
+package spring
 
 import (
 	"archive/zip"
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -12,11 +13,11 @@ import (
 
 var Url = "https://start.spring.io/starter.zip?type=maven-project&language=java&bootVersion=4.0.0&baseDir=demo&groupId=com.example&artifactId=demo&name=demo&description=Demo%20project%20for%20Spring%20Boot&packageName=com.example.demo&packaging=jar&javaVersion=17"
 
-func StarterZip() error {
-	zipFile := "demo.zip"
+func (pi ProjectInitializr) Starter() error {
+	zipFile := pi.ProjectMetadata.Name + ".zip"
 
 	// 1️⃣ Download file
-	err := downloadFile(zipFile, Url)
+	err := pi.downloadStarterZip()
 	if err != nil {
 		return err
 	}
@@ -39,10 +40,31 @@ func StarterZip() error {
 	return nil
 }
 
-func downloadFile(filepath, url string) error {
-	// prepare form data (e.g. dependencies=web)
+func (pi ProjectInitializr) URL() string {
+
+	base := "https://start.spring.io/starter.zip"
+
+	params := url.Values{}
+	params.Add("type", pi.Project)
+	params.Add("language", pi.Language)
+	params.Add("bootVersion", pi.SpringBootVersion)
+	params.Add("groupId", pi.ProjectMetadata.GroupID)
+	params.Add("artifactId", pi.ProjectMetadata.ArtifactID)
+	params.Add("name", pi.ProjectMetadata.Name)
+	params.Add("description", pi.ProjectMetadata.Description)
+	params.Add("packageName", pi.ProjectMetadata.PackageName)
+	params.Add("packaging", pi.ProjectMetadata.Packaging)
+	params.Add("javaVersion", pi.ProjectMetadata.JavaVersion)
+
+	url := base + "?" + params.Encode()
+	fmt.Println(url)
+	return url
+}
+
+func (pi ProjectInitializr) downloadStarterZip() error {
+	zipFile := pi.ProjectMetadata.Name + ".zip"
 	data := strings.NewReader("dependencies=web")
-	req, err := http.NewRequest("POST", url, data)
+	req, err := http.NewRequest("POST", pi.URL(), data)
 	if err != nil {
 		return err
 	}
@@ -60,7 +82,7 @@ func downloadFile(filepath, url string) error {
 		return fmt.Errorf("non-200 response: %d", resp.StatusCode)
 	}
 
-	out, err := os.Create(filepath)
+	out, err := os.Create(zipFile)
 	if err != nil {
 		return err
 	}
