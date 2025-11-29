@@ -1,28 +1,27 @@
 package initializr
 
 type SpringInitializrResponse struct {
-	Links        Links              `json:"_links"`
-	Dependencies DependenciesConfig `json:"dependencies"`
-	Type         ConfigOption       `json:"type"`
-	Packaging    SimpleConfigOption `json:"packaging"`
-	JavaVersion  SimpleConfigOption `json:"javaVersion"`
-	Language     SimpleConfigOption `json:"language"`
-	BootVersion  SimpleConfigOption `json:"bootVersion"`
-	GroupID      TextConfig         `json:"groupId"`
-	ArtifactID   TextConfig         `json:"artifactId"`
-	Version      TextConfig         `json:"version"`
-	Name         TextConfig         `json:"name"`
-	Description  TextConfig         `json:"description"`
-	PackageName  TextConfig         `json:"packageName"`
+	Links                   map[string]Link    `json:"_links"`
+	Dependencies            DependenciesConfig `json:"dependencies"`
+	Type                    SimpleConfigOption `json:"type"`
+	Packaging               SimpleConfigOption `json:"packaging"`
+	JavaVersion             SimpleConfigOption `json:"javaVersion"`
+	Language                SimpleConfigOption `json:"language"`
+	BootVersion             SimpleConfigOption `json:"bootVersion"`
+	GroupID                 TextConfig         `json:"groupId"`
+	ArtifactID              TextConfig         `json:"artifactId"`
+	Version                 TextConfig         `json:"version"`
+	Name                    TextConfig         `json:"name"`
+	Description             TextConfig         `json:"description"`
+	PackageName             TextConfig         `json:"packageName"`
+	ConfigurationFileFormat SimpleConfigOption `json:"configurationFileFormat"`
 }
-
-// Links represents hypermedia links
-type Links map[string]Link
 
 // Link represents a single hypermedia link
 type Link struct {
-	Href      string `json:"href"`
-	Templated bool   `json:"templated,omitempty"`
+	Href      *string `json:"href,omitempty"`
+	Title     *string `json:"title,omitempty"`
+	Templated *bool   `json:"templated,omitempty"`
 }
 
 // DependenciesConfig represents the dependencies configuration
@@ -39,11 +38,11 @@ type DependencyGroup struct {
 
 // DependencyDetail represents detailed information about a dependency
 type DependencyDetail struct {
-	ID           string         `json:"id"`
-	Name         string         `json:"name"`
-	Description  string         `json:"description"`
-	VersionRange string         `json:"versionRange,omitempty"`
-	Links        map[string]any `json:"_links,omitempty"`
+	ID           string          `json:"id"`
+	Name         string          `json:"name"`
+	Description  string          `json:"description"`
+	VersionRange *string         `json:"versionRange,omitempty"`
+	Links        *map[string]any `json:"_links,omitempty"`
 }
 
 // ConfigOption represents a configuration option with multiple values
@@ -77,8 +76,14 @@ type SimpleConfigValue struct {
 
 // TextConfig represents a text input configuration
 type TextConfig struct {
-	Type    string `json:"type"`
-	Default string `json:"default"`
+	Type    string        `json:"type"`
+	Default string        `json:"default"`
+	Values  *[]IdNamePair `json:"values,omitempty"`
+}
+
+type IdNamePair struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
 }
 
 // DependencyReference represents a reference link for a dependency
@@ -147,7 +152,7 @@ func (r *SpringInitializrResponse) GetJavaVersions() []string {
 func (r *SpringInitializrResponse) GetBootVersions() []string {
 	var versions []string
 	for _, v := range r.BootVersion.Values {
-		versions = append(versions, v.ID)
+		versions = append(versions, v.Name)
 	}
 	return versions
 }
@@ -162,8 +167,21 @@ func (r *SpringInitializrResponse) GetLanguages() []string {
 }
 
 // GetBuildTypes returns available build types
-func (r *SpringInitializrResponse) GetBuildTypes() []ConfigValue {
-	return r.Type.Values
+func (r *SpringInitializrResponse) GetBuildTypes() []string {
+	var types []string
+	for _, p := range r.Packaging.Values {
+		types = append(types, p.ID)
+	}
+	return types
+}
+
+// GetProjectTypes returns available build types
+func (r *SpringInitializrResponse) GetProjectTypes() []string {
+	var types []string
+	for _, p := range r.Type.Values {
+		types = append(types, p.Name)
+	}
+	return types
 }
 
 // GetPackagingTypes returns available packaging types
@@ -172,5 +190,11 @@ func (r *SpringInitializrResponse) GetPackagingTypes() []string {
 	for _, p := range r.Packaging.Values {
 		types = append(types, p.ID)
 	}
+	return types
+}
+
+// GetPackagingTypes returns available packaging types
+func (r *SpringInitializrResponse) GetConfigurationFileFormat() []string {
+	types := []string{"Properties", "YAML"}
 	return types
 }

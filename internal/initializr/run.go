@@ -1,8 +1,8 @@
 package initializr
 
 import (
+	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 )
@@ -11,7 +11,7 @@ const (
 	SpringInitializrMetadataURL = "https://start.spring.io/metadata/client"
 )
 
-func Run() {
+func Run() (SpringInitializrResponse, error) {
 	res, err := http.Get(SpringInitializrMetadataURL)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error fetching metadata: %v\n", err)
@@ -24,19 +24,10 @@ func Run() {
 		os.Exit(1)
 	}
 
-	// save reponsonse to file
-	outFile, err := os.Create("res.json")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error creating file: %v\n", err)
-		os.Exit(1)
-	}
-	defer outFile.Close()
-
-	_, err = io.Copy(outFile, res.Body)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error saving response to file: %v\n", err)
-		os.Exit(1)
+	var response SpringInitializrResponse
+	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
+		return SpringInitializrResponse{}, fmt.Errorf("failed to decode metadata: %w", err)
 	}
 
-	fmt.Println("Metadata saved to res.json")
+	return response, nil
 }

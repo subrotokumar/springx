@@ -1,52 +1,112 @@
-/*
-Copyright © 2025 Subroto Kumar <subrotokumar@outlook.in>
-*/
 package cmd
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/spf13/cobra"
-	"github.com/subrotokumar/springx/internal/initializr"
+	"github.com/subrotokumar/springx/cmd/core"
+	"github.com/subrotokumar/springx/cmd/option"
+	"github.com/subrotokumar/springx/cmd/ui/inputtext"
+	"github.com/subrotokumar/springx/cmd/ui/selector"
+	springInitizr "github.com/subrotokumar/springx/internal/initializr"
 )
 
-// Command line flags
-var (
-	groupID      string
-	artifactID   string
-	version      string
-	description  string
-	packageName  string
-	javaVersion  string
-	buildTool    string
-	dependencies string
-	outputDir    string
-	listDeps     bool
-)
+const logo = `
+ ____             _
+/ ___| _ __  _ __(_)_ __   __ ___  __
+\___ \| '_ \| '__| | '_ \ / _‛ \ \/ /
+ ___) | |_) | |  | | | | | (_| |>  <
+|____/| .__/|_|  |_|_| |_|\__, /_/\_\
+      |_|                  |___/
+`
 
 var initCmd = &cobra.Command{
 	Use:   "init [project-name]",
 	Short: "Initialize a new Spring Boot project",
 	Long: `Initialize a new Spring Boot project with the specified configuration.
-	
+
 You can customize the project by using various flags to specify dependencies,
 build tool, Java version, and other project metadata.`,
 	Args: cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		initializr.Run()
+		// reader := bufio.NewReader(os.Stdin)
+		fmt.Println()
+		fmt.Println(core.LogoStyle.Render(logo))
+
+		initializr, err := springInitizr.Run()
+		if err != nil {
+			fmt.Printf("%v", err.Error())
+			os.Exit(0)
+		}
+
+		projectMetadata := option.ProjectMetadata{
+			GroupID:       initializr.GroupID.Default,
+			ArtifactID:    initializr.ArtifactID.Default,
+			Name:          initializr.Name.Default,
+			Description:   initializr.Description.Default,
+			PackageName:   initializr.PackageName.Default,
+			Packaging:     initializr.Packaging.Default,
+			Configuration: initializr.ConfigurationFileFormat.Default,
+			JavaVersion:   initializr.JavaVersion.Default,
+		}
+		ProjectInitializr := option.ProjectInitializr{
+			Project:           initializr.Type.Default,
+			Language:          initializr.Language.Default,
+			SpringBootVersion: initializr.BootVersion.Default,
+		}
+
+		title := "Project"
+		ProjectInitializr.Project = selector.New(title, initializr.GetProjectTypes()).Run()
+		fmt.Printf("%s: %s\n", core.QuestionStyle.Render(title), ProjectInitializr.Project)
+
+		title = "Language"
+		ProjectInitializr.Language = selector.New(title, initializr.GetLanguages()).Run()
+		fmt.Printf("%s: %s\n", core.QuestionStyle.Render(title), ProjectInitializr.Language)
+
+		title = "Spring Boot Version"
+		ProjectInitializr.SpringBootVersion = selector.New(title, initializr.GetBootVersions()).Run()
+		fmt.Printf("%s: %s\n", core.QuestionStyle.Render(title), ProjectInitializr.SpringBootVersion)
+
+		title = "Group"
+		projectMetadata.GroupID = inputtext.New(title, initializr.GroupID.Default).Run()
+		fmt.Printf("\n%s\n", core.QuestionStyle.Render("Metadata: "))
+		fmt.Printf("  %s: %s\n", core.LogoStyle.Render(title), projectMetadata.GroupID)
+
+		title = "Artifact"
+		projectMetadata.ArtifactID = inputtext.New(title, initializr.ArtifactID.Default).Run()
+		fmt.Printf("  %s: %s\n", core.LogoStyle.Render(title), projectMetadata.ArtifactID)
+
+		title = "Name"
+		projectMetadata.Name = inputtext.New(title, initializr.ArtifactID.Default).Run()
+		fmt.Printf("  %s: %s\n", core.LogoStyle.Render(title), projectMetadata.Name)
+
+		title = "Description"
+		projectMetadata.Description = inputtext.New(title, initializr.Description.Default).Run()
+		fmt.Printf("  %s: %s\n", core.LogoStyle.Render(title), projectMetadata.Description)
+
+		title = "Package name"
+		projectMetadata.PackageName = inputtext.New(title, initializr.PackageName.Default).Run()
+		fmt.Printf("  %s: %s\n", core.LogoStyle.Render(title), projectMetadata.PackageName)
+
+		title = "Packaging"
+		projectMetadata.Packaging = selector.New(title, initializr.GetPackagingTypes()).Run()
+		fmt.Printf("  %s: %s\n", core.LogoStyle.Render(title), projectMetadata.Packaging)
+
+		title = "Configuration"
+		projectMetadata.Configuration = selector.New(title, initializr.GetConfigurationFileFormat()).Run()
+		fmt.Printf("  %s: %s\n", core.LogoStyle.Render(title), projectMetadata.Configuration)
+
+		title = "Java"
+		projectMetadata.JavaVersion = selector.New(title, initializr.GetJavaVersions()).Run()
+		fmt.Printf("  %s: %s\n", core.LogoStyle.Render(title), projectMetadata.JavaVersion)
+
+		if err := springInitizr.StarterZip(); err != nil {
+			panic(err)
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(initCmd)
-
-	// Add flags
-	initCmd.Flags().StringVarP(&groupID, "group", "g", "", "Group ID (e.g., com.example)")
-	initCmd.Flags().StringVarP(&artifactID, "artifact", "a", "", "Artifact ID (defaults to project name)")
-	initCmd.Flags().StringVarP(&version, "version", "v", "", "Project version (default: 0.0.1-SNAPSHOT)")
-	initCmd.Flags().StringVarP(&description, "description", "d", "", "Project description")
-	initCmd.Flags().StringVarP(&packageName, "package", "p", "", "Base package name")
-	initCmd.Flags().StringVarP(&javaVersion, "java", "j", "", "Java version (default: 17)")
-	initCmd.Flags().StringVarP(&buildTool, "build", "b", "", "Build tool: maven or gradle (default: maven)")
-	initCmd.Flags().StringVarP(&dependencies, "deps", "", "", "Comma-separated list of dependencies")
-	initCmd.Flags().StringVarP(&outputDir, "output", "o", "", "Output directory (defaults to project name)")
-	initCmd.Flags().BoolVarP(&listDeps, "list", "l", false, "List available dependencies")
 }
