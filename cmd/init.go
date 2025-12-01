@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/subrotokumar/springx/cmd/core"
 	"github.com/subrotokumar/springx/cmd/ui/inputtext"
+	"github.com/subrotokumar/springx/cmd/ui/listview"
 	"github.com/subrotokumar/springx/cmd/ui/selector"
 	"github.com/subrotokumar/springx/internal/spring"
 )
@@ -101,6 +102,19 @@ build tool, Java version, and other project metadata.`,
 		fmt.Printf("  %s: %s\n", core.LogoStyle.Render(title), projectMetadata.JavaVersion)
 
 		projectInitializr.ProjectMetadata = projectMetadata
+
+		if false {
+			dependencies := []listview.ItemType{}
+
+			for _, dependencyGroup := range initializr.Dependencies.Values {
+				// tag := dependencyGroup.Name
+				for _, detail := range dependencyGroup.Values {
+					dependencies = append(dependencies, listview.NewItem(detail))
+				}
+			}
+
+			listview.New(dependencies).Run()
+		}
 
 		if err := projectInitializr.Starter(); err != nil {
 			panic(err)
