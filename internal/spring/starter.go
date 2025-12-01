@@ -9,9 +9,14 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/charmbracelet/lipgloss"
 )
 
 var Url = "https://start.spring.io/starter.zip?type=maven-project&language=java&bootVersion=4.0.0&baseDir=demo&groupId=com.example&artifactId=demo&name=demo&description=Demo%20project%20for%20Spring%20Boot&packageName=com.example.demo&packaging=jar&javaVersion=17"
+var successStyle = lipgloss.NewStyle().
+	Bold(true).
+	Foreground(lipgloss.Color("#00FF5F"))
 
 func (pi ProjectInitializr) Starter() error {
 	zipFile := pi.ProjectMetadata.Name + ".zip"
@@ -21,14 +26,14 @@ func (pi ProjectInitializr) Starter() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("Downloaded:", zipFile)
+	fmt.Println("> Downloaded:", zipFile)
 
 	// 2️⃣ Extract
 	err = unzip(zipFile, "./")
 	if err != nil {
 		return err
 	}
-	fmt.Println("Extracted successfully")
+	fmt.Println("> Extracted successfully")
 
 	// 3️⃣ Delete ZIP
 	err = os.Remove(zipFile)
@@ -36,13 +41,15 @@ func (pi ProjectInitializr) Starter() error {
 		return err
 	}
 
-	fmt.Println("Zip file deleted")
+	fmt.Println(successStyle.Render("⌀ Project created successfully 🚀!"))
+
 	return nil
 }
 
 func (pi ProjectInitializr) URL() string {
 
 	base := "https://start.spring.io/starter.zip"
+	pi.SpringBootVersion = strings.ReplaceAll(pi.SpringBootVersion, " (SNAPSHOT)", "-SNAPSHOT")
 
 	params := url.Values{}
 	params.Add("type", pi.Project)
@@ -50,14 +57,39 @@ func (pi ProjectInitializr) URL() string {
 	params.Add("bootVersion", pi.SpringBootVersion)
 	params.Add("groupId", pi.ProjectMetadata.GroupID)
 	params.Add("artifactId", pi.ProjectMetadata.ArtifactID)
+	params.Add("baseDir", pi.ProjectMetadata.Name)
 	params.Add("name", pi.ProjectMetadata.Name)
 	params.Add("description", pi.ProjectMetadata.Description)
 	params.Add("packageName", pi.ProjectMetadata.PackageName)
 	params.Add("packaging", pi.ProjectMetadata.Packaging)
 	params.Add("javaVersion", pi.ProjectMetadata.JavaVersion)
+	params.Add("configurationFileFormat", strings.ToLower(pi.ProjectMetadata.Configuration))
 
 	url := base + "?" + params.Encode()
-	fmt.Println(url)
+
+	titleStyle := lipgloss.NewStyle().
+		Bold(true).
+		Foreground(lipgloss.Color("#20ff93ff"))
+
+	keyStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("#5FD7FF"))
+
+	valueStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("#FFD75F"))
+
+	fmt.Println()
+	fmt.Println(titleStyle.Render("🔗 Generated Spring Initializr URL\n"))
+	fmt.Println(titleStyle.Render(base + "?"))
+	for key, values := range params {
+		for _, val := range values {
+			fmt.Printf("  %s=%s\n",
+				keyStyle.Render(key),
+				valueStyle.Render(val),
+			)
+		}
+	}
+	fmt.Println()
+
 	return url
 }
 
@@ -77,7 +109,7 @@ func (pi ProjectInitializr) downloadStarterZip() error {
 	}
 	defer resp.Body.Close()
 
-	fmt.Println("Status:", resp.StatusCode)
+	fmt.Println("> Status:", resp.StatusCode)
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("non-200 response: %d", resp.StatusCode)
 	}

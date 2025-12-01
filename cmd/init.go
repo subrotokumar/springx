@@ -50,13 +50,13 @@ build tool, Java version, and other project metadata.`,
 			JavaVersion:   initializr.JavaVersion.Default,
 		}
 		projectInitializr := spring.ProjectInitializr{
-			Project:           initializr.Type.Default,
+			Project:           "maven-project",
 			Language:          initializr.Language.Default,
 			SpringBootVersion: initializr.BootVersion.Default,
 		}
 
 		title := "Project"
-		projectInitializr.Project = selector.New(title, initializr.GetProjectTypes()).Run()
+		projectInitializr.Project = selector.New(title, []string{"maven-project", "gradle-project-kotlin", "gradle-project"}).Run()
 		fmt.Printf("%s: %s\n", core.QuestionStyle.Render(title), projectInitializr.Project)
 
 		title = "Language"
