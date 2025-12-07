@@ -14,6 +14,7 @@ import (
 )
 
 var Url = "https://start.spring.io/starter.zip?type=maven-project&language=java&bootVersion=4.0.0&baseDir=demo&groupId=com.example&artifactId=demo&name=demo&description=Demo%20project%20for%20Spring%20Boot&packageName=com.example.demo&packaging=jar&javaVersion=17"
+
 var successStyle = lipgloss.NewStyle().
 	Bold(true).
 	Foreground(lipgloss.Color("#00FF5F"))
@@ -64,6 +65,7 @@ func (pi ProjectInitializr) URL() string {
 	params.Add("packaging", pi.ProjectMetadata.Packaging)
 	params.Add("javaVersion", pi.ProjectMetadata.JavaVersion)
 	params.Add("configurationFileFormat", strings.ToLower(pi.ProjectMetadata.Configuration))
+	params.Set("dependencies", strings.Join(pi.Dependencies, ","))
 
 	url := base + "?" + params.Encode()
 
@@ -95,8 +97,8 @@ func (pi ProjectInitializr) URL() string {
 
 func (pi ProjectInitializr) downloadStarterZip() error {
 	zipFile := pi.ProjectMetadata.Name + ".zip"
-	data := strings.NewReader("dependencies=web")
-	req, err := http.NewRequest("POST", pi.URL(), data)
+
+	req, err := http.NewRequest("POST", pi.URL(), strings.NewReader(url.Values{}.Encode()))
 	if err != nil {
 		return err
 	}

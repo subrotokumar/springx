@@ -5,6 +5,7 @@ type ProjectInitializr struct {
 	Language          string
 	SpringBootVersion string
 	ProjectMetadata   ProjectMetadata
+	Dependencies      []string
 }
 
 type ProjectMetadata struct {

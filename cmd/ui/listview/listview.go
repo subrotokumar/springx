@@ -3,7 +3,6 @@ package listview
 import (
 	"fmt"
 	"os"
-	"sort"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -46,26 +45,12 @@ func (i item) Description() string {
 }
 
 func (i item) FilterValue() string { return i.title }
+func (i item) Id() string          { return i.ID }
 
 type model struct {
 	list     list.Model
-	selected core.Set[spring.DependencyDetail]
+	selected core.Set[string]
 	options  []spring.DependencyDetail
-}
-
-func (m *model) UpdateList() {
-	inputOptions := []list.Item{}
-
-	sort.Slice(m.options, func(i, j int) bool {
-		return !m.options[i].Selected && m.options[j].Selected
-	})
-
-	for _, val := range m.options {
-		inputOptions = append(inputOptions, NewItem(val))
-	}
-
-	m.list = list.New(inputOptions, list.NewDefaultDelegate(), 0, 0)
-	m.list.Title = "Dependencies"
 }
 
 func New(options []spring.DependencyGroup) model {
@@ -79,7 +64,15 @@ func New(options []spring.DependencyGroup) model {
 		}
 	}
 	m := model{options: detailList}
-	m.UpdateList()
+	inputOptions := []list.Item{}
+
+	for _, val := range m.options {
+		inputOptions = append(inputOptions, NewItem(val))
+	}
+
+	m.list = list.New(inputOptions, list.NewDefaultDelegate(), 0, 0)
+	m.list.Title = "Dependencies"
+	m.selected = make(core.Set[string])
 	return m
 }
 
@@ -94,8 +87,13 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyCtrlC:
 			return m, tea.Quit
 		case tea.KeySpace:
-			index := m.list.Index()
+			index := m.list.GlobalIndex()
 			m.options[index].Selected = !m.options[index].Selected
+			if m.options[index].Selected {
+				m.selected.Add(m.options[index].ID)
+			} else {
+				m.selected.Remove(m.options[index].ID)
+			}
 			m.list.SetItem(index, NewItem(m.options[index]))
 			return m, nil
 		}
@@ -103,7 +101,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h, v := docStyle.GetFrameSize()
 		m.list.SetSize(msg.Width-h, msg.Height-v)
 	}
-
 	var cmd tea.Cmd
 	m.list, cmd = m.list.Update(msg)
 	return m, cmd
@@ -113,10 +110,12 @@ func (m *model) View() string {
 	return docStyle.Render(m.list.View())
 }
 
-func (m model) Run() {
+func (m model) Run() []string {
 	p := tea.NewProgram(&m, tea.WithAltScreen())
 	if _, err := p.Run(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)
 	}
+
+	return m.selected.ToSlice()
 }

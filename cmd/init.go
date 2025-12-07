@@ -106,9 +106,12 @@ build tool, Java version, and other project metadata.`,
 		}
 
 		projectInitializr.ProjectMetadata = projectMetadata
-
-		if false {
-			listview.New(initializr.Dependencies.Values).Run()
+		if true {
+			projectInitializr.Dependencies = listview.New(initializr.Dependencies.Values).Run()
+			fmt.Printf("\n%s\n", core.QuestionStyle.Render("Selected Dependencies:"))
+			for _, dep := range projectInitializr.Dependencies {
+				fmt.Printf("  - %s\n", dep)
+			}
 		}
 
 		if err := projectInitializr.Starter(); err != nil {
