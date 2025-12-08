@@ -32,3 +32,5 @@ go.work.sum
 # .vscode/
 
 **/springx
+# Added by goreleaser init:
+dist/
