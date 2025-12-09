@@ -108,9 +108,9 @@ build tool, Java version, and other project metadata.`,
 		projectInitializr.ProjectMetadata = projectMetadata
 		if true {
 			projectInitializr.Dependencies = listview.New(initializr.Dependencies.Values).Run()
-			fmt.Printf("\n%s\n", core.QuestionStyle.Render("Selected Dependencies:"))
+			fmt.Printf("  %s\n", core.LogoStyle.Render("Selected Dependencies:"))
 			for _, dep := range projectInitializr.Dependencies {
-				fmt.Printf("  - %s\n", dep)
+				fmt.Printf("    - %s\n", dep)
 			}
 		}
 

@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/subrotokumar/springx/cmd/core"
 )
 
 var Url = "https://start.spring.io/starter.zip?type=maven-project&language=java&bootVersion=4.0.0&baseDir=demo&groupId=com.example&artifactId=demo&name=demo&description=Demo%20project%20for%20Spring%20Boot&packageName=com.example.demo&packaging=jar&javaVersion=17"
@@ -40,7 +41,7 @@ func (pi ProjectInitializr) Starter() error {
 		return err
 	}
 
-	fmt.Println(successStyle.Render("⌀ Project created successfully 🚀!"))
+	fmt.Println(successStyle.Render("⌀ Project created successfully 🚀 !"))
 
 	return nil
 }
@@ -78,7 +79,8 @@ func (pi ProjectInitializr) URL() string {
 		Foreground(lipgloss.Color("#FFD75F"))
 
 	fmt.Println()
-	fmt.Println(titleStyle.Render("🔗 Generated Spring Initializr URL\n"))
+	fmt.Println(titleStyle.Render("Generated Spring Initializr URL"))
+	fmt.Printf("\n🔗 %s\n\n", core.GreyStyle.Render(url))
 	fmt.Println(titleStyle.Render(base + "?"))
 	for key, values := range params {
 		for _, val := range values {

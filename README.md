@@ -1,15 +1,14 @@
 # SpringX – Spring Initializr TUI CLI 🚀
 
-A fast, interactive **Terminal User Interface (TUI)** CLI tool for generating new **Spring Boot** projects using the official **Spring Initializr** API — powered by **Go** and the beautiful **Bubble Tea** framework.
+A fast, interactive Terminal User Interface (TUI) CLI tool for generating new **Spring Boot** projects using the official **Spring Initializr** API, powered by **Go** .
 No browser required. Just pick your project options from the terminal and bootstrap instantly! ⚡
 
----
+
 
 ## ✨ Features
 
 * 🌀 Interactive TUI experience using Bubble Tea
 * 📦 Select:
-
   * Spring Boot version
   * Project type (Maven/Gradle)
   * Java version
@@ -19,28 +18,20 @@ No browser required. Just pick your project options from the terminal and bootst
 * 🔗 Uses the official Spring Initializr metadata API
 * 🧩 Keyboard-first navigation
 
----
 
 ## 📸 Preview
 
 ![](./public/demo.gif)
 
 
----
-
-## 🧰 Tech Stack
-
-| Component             | Purpose                       |
-| --------------------- | ----------------------------- |
-| Go                    | Core language                 |
-| Bubble Tea            | TUI UI framework              |
-| Lipgloss              | Styling                       |
-| Bubbles               | UI widgets                    |
-| Spring Initializr API | Metadata + project generation |
-
----
-
 ## 📦 Installation
+
+
+### Quick Install
+
+```bash
+go install github.com/subrotokumar/springx@latest
+```
 
 ### From Source
 
@@ -58,7 +49,6 @@ Install to PATH:
 go install
 ```
 
----
 
 ## 🚀 Usage
 
@@ -71,7 +61,6 @@ springx
 Follow the interactive terminal UI to configure your project.
 Once done, your Spring Boot project will be created and extracted automatically.
 
----
 
 ## ⌨️ Controls
 
@@ -83,21 +72,18 @@ Once done, your Spring Boot project will be created and extracted automatically.
 | Multi Select      | Space      |
 | Quit              | Ctrl + C   |
 
----
 
 ## 🤝 Contributing
 
 Contributions are welcome! ❤️
 Please open an issue or submit a pull request.
 
----
 
 ## 📝 License
 
 This project is licensed under the **MIT License**.
 See the `LICENSE` file for more details.
 
----
 
 ## ⭐ Support
 

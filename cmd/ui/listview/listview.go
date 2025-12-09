@@ -3,6 +3,7 @@ package listview
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -33,17 +34,19 @@ func NewItem(param spring.DependencyDetail) item {
 
 func (i item) Title() string {
 	tag := "(" + core.GreyStyle.Render(i.Tag) + ")"
+	title := fmt.Sprintf("%s  %s", i.title, core.GreyStyle.Render(tag))
 	if selected.Has(i.DependencyDetail.ID) {
-		return fmt.Sprintf("%s %s  %s", SELECTOR_INDICATOR, i.FilterValue(), core.GreyStyle.Render(tag))
+		title = fmt.Sprintf("%s %s  %s", SELECTOR_INDICATOR, i.FilterValue(), core.GreyStyle.Render(tag))
 	}
-	return fmt.Sprintf("%s  %s", i.title, core.GreyStyle.Render(tag))
+	if i.DependencyDetail.VersionRange != nil {
+		versionRange := *i.DependencyDetail.VersionRange
+		versionRange = strings.ReplaceAll(versionRange, ",", " , ")
+		return fmt.Sprintf("%s\t%s", title, core.RedStyle.Render(versionRange))
+	}
+	return title
 }
 
 func (i item) Description() string {
-	if i.DependencyDetail.VersionRange != nil {
-		versionRange := *i.DependencyDetail.VersionRange
-		return fmt.Sprintf("%s %s", i.desc, core.RedStyle.Render(versionRange))
-	}
 	return i.desc
 }
 
