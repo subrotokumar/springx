@@ -51,7 +51,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *model) View() string {
-	s := core.QuestionStyle.Render(m.title) + ":\n"
+	s := "\n" + core.QuestionStyle.Render(m.title) + ":\n"
 
 	for i, opt := range m.option {
 		cursor := "[ ]"

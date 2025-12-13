@@ -9,6 +9,8 @@ import (
 	"github.com/subrotokumar/springx/cmd/core"
 )
 
+var hidePlaceHolder = true
+
 type (
 	errMsg error
 )
@@ -67,6 +69,13 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *model) View() string {
 	if m.quitting {
 		return ""
+	}
+	if hidePlaceHolder {
+		return fmt.Sprintf(
+			"\n%s :\n%s",
+			core.QuestionStyle.Render(m.title),
+			m.textInput.View(),
+		) + "\n"
 	}
 	return fmt.Sprintf(
 		"\n%s (%s):\n%s",
