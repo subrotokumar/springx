@@ -27,15 +27,22 @@ const logo = `
 type ProjectType string
 
 var initCmd = &cobra.Command{
-	Use:   "init",
-	Short: "Initialize a new Spring Boot project",
-	Long: `Initialize a new Spring Boot project with the specified configuration.
+	Use:   "init <project-type>",
+	Short: "Initialize a new Java project",
+	Long: `Initialize a new Java project with the specified configuration.
 
-You can customize the project by using various flags to specify dependencies,
-build tool, Java version, and other project metadata.`,
-	Args: cobra.MaximumNArgs(1),
+You must specify a project type as an argument.
+
+Supported project types:
+  - spring | springboot
+  - quarkus
+
+Example:
+  stackctl init spring
+  stackctl init quarkus
+`,
+	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		// reader := bufio.NewReader(os.Stdin)
 		fmt.Println()
 		if core.ShowLogo {
 			fmt.Println(core.LogoStyle.Render(logo))
@@ -52,6 +59,9 @@ build tool, Java version, and other project metadata.`,
 		case "quarkus":
 			fmt.Println(core.GreenStyle.Render("QUARKUS"))
 			QuarkusStarter(cmd, args)
+		default:
+			fmt.Println(core.RedStyle.Render("❌ Unknown project type: " + project))
+			fmt.Println("Supported types: spring, springboot, quarkus")
 		}
 	},
 }
