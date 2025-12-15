@@ -49,6 +49,12 @@ Dependencies (multi-select with search)
 
 ## 📦 Installation
 
+### Install directly
+
+```bash
+go install github.com/subrotokumar/stackctl@latest
+```
+
 ### From Source
 
 Make sure you have Go 1.21+ installed.
@@ -56,12 +62,6 @@ Make sure you have Go 1.21+ installed.
 ```bash
 git clone https://github.com/subrotokumar/stackctl.git
 cd stackctl
-go build -o stackctl
-```
-
-Install to PATH:
-
-```bash
 go install
 ```
 

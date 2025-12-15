@@ -33,7 +33,7 @@ func NewItem(param quarkus.Extension) item {
 }
 
 func (i item) Title() string {
-	id := core.BlueStyle.Render(fmt.Sprintf("[%s]", core.BlueStyle.Render(strings.Split(i.ID, ":")[1])))
+	id := core.BlueStyle.Render(fmt.Sprintf("[%s]", strings.Split(i.ID, ":")[1]))
 
 	isSelected := ""
 	platform := ""
@@ -50,7 +50,7 @@ func (i item) Title() string {
 	for _, val := range i.Tags {
 		switch val {
 		case "with:starter-code":
-			tag = fmt.Sprintf("%s %s ", tag, core.StartedCode.Render("Starter Code"))
+			tag = fmt.Sprintf("%s %s ", tag, core.StartedCode.Render("(Starter Code)"))
 		case "status:stable":
 			tag = tag + ""
 		case "status:deprecated":

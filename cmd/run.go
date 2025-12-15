@@ -53,7 +53,7 @@ func detectBuildTool() (tool string, args []string, err error) {
 
 var runCmd = &cobra.Command{
 	Use:   "run",
-	Short: "Run a Spring Boot project",
+	Short: "Run a Spring and Quarkus project",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// Quick Spring Boot detection (properties or yml)

@@ -17,8 +17,8 @@ var (
 	StartedCode = lipgloss.NewStyle().
 			Margin(0).
 			Padding(0, 1).
-			Background(lipgloss.Color("#fcfc7393")).
-			Foreground(lipgloss.Color("#ffffffff")).
+			// Background(lipgloss.Color("#FFFF00")).
+			Foreground(lipgloss.Color("#FFFF00")).
 			Bold(true)
 
 	DeprecatedCode = lipgloss.NewStyle().
